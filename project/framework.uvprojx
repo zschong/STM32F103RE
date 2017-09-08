@@ -454,6 +454,26 @@
               <FileType>5</FileType>
               <FilePath>..\systick.h</FilePath>
             </File>
+            <File>
+              <FileName>ai.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ai.c</FilePath>
+            </File>
+            <File>
+              <FileName>ai.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\ai.h</FilePath>
+            </File>
+            <File>
+              <FileName>ao.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ao.c</FilePath>
+            </File>
+            <File>
+              <FileName>ao.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\ao.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

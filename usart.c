@@ -1,5 +1,6 @@
-#include <stdio.h>
+#include "gpio.h"
 #include "usart.h"
+#include "stdiox.h"
 #include "systick.h"
 
 void UsartConfig(USART_TypeDef *usartx, int baud, int parity, int bsize, int stop)
