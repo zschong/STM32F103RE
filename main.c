@@ -8,6 +8,7 @@
 #include "eeprom.h"
 #include "systick.h"
 #include "stdiox.h"
+#include "AD5412.h"
 
 
 #define DELAY	DelayMSecond(100)
@@ -125,30 +126,27 @@ void AiTest(void)
 }
 void AoTest(void)
 {
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 2; i++)
 	{
-		AoReset(i);
-		DelayMSecond(10);
-
-		AoSetType(i, AO_Type_0_To_10_V);
-		DelayMSecond(10);
-
-		AoSetValue(i, 3.0);
-		DelayMSecond(10);
-
-		printf("AO[%d].Status =%04X ", i, AoGetStatus(i));
-		DelayMSecond(10);
-		printf("\n");
-
-		printf("AO[%d].Control =%04X ", i, AoGetControl(i));
-		DelayMSecond(10);
-		printf("\n");
-
-		printf("AO[%d].Value =%f ", i, AoGetValue(i));
-		DelayMSecond(10);
-		printf("\n");
-		DelayMSecond(10);
-		printf("\n");
+		AD5412_SetType(i, AD5412_Type_0_To_10_V);
+		DelayMSecond(1000);
+		printf("AO[%d].control=%04X\n ", i, AD5412_GetControl(i));
+		DelayMSecond(1000);
+		AD5412_SetValue(i, 1.5 * (4096.0 / 10.0));
+		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
+		DelayMSecond(1000);
+		AD5412_SetValue(i, 3.5 * (4096.0 / 10.0));
+		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
+		DelayMSecond(1000);
+		AD5412_SetValue(i, 5.5 * (4096.0 / 10.0));
+		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
+		DelayMSecond(1000);
+		AD5412_SetValue(i, 7.5 * (4096.0 / 10.0));
+		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
+		DelayMSecond(1000);
+		AD5412_SetValue(i, 10.0 * (4096.0 / 10.0));
+		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
+		DelayMSecond(1000);
 	}
 }
 void RtcTest(void)
@@ -207,11 +205,11 @@ int main(void)
 	{
 		if( Timeout(&timeout, 200) )
 		{	
-			LedTest();
-			AiTest();
+			//LedTest();
+			//AiTest();
 			AoTest();
-			RtcTest();
-			EepromTest();
+			//RtcTest();
+			//EepromTest();
 			UsartTest();
 		}
 	}

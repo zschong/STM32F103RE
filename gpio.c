@@ -149,3 +149,11 @@ void GpioOff(int gpio)
 {
 	GPIO_ResetBits(GetPort(gpio), (0xffff & gpio));
 }
+bool GpioInputValue(int gpio)
+{
+	return (bool)(GPIO_ReadInputDataBit(GetPort(gpio), (0xffff & gpio)) != 0);
+}
+bool GpioOutputValue(int gpio)
+{
+	return (bool)(GPIO_ReadOutputDataBit(GetPort(gpio), (0xffff & gpio)) != 0);
+}

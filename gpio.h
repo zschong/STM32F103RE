@@ -5,6 +5,12 @@
 
 typedef enum
 {
+	false = 0,
+	true = 1,
+}bool;
+
+typedef enum
+{
 	PA0	  = (0xA << 24 | GPIO_Pin_0),
 	PA1	  = (0xA << 24 | GPIO_Pin_1),
 	PA2	  = (0xA << 24 | GPIO_Pin_2),
@@ -132,5 +138,7 @@ void GpioPinOff(GPIO_TypeDef* gpiox, uint32_t pin);
 void GpioInit(int gpio, int mode, int speed);
 void GpioOn(int gpio);
 void GpioOff(int gpio);
+bool GpioInputValue(int gpio);
+bool GpioOutputValue(int gpio);
 
 #endif//__GPIO_H__

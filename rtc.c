@@ -84,5 +84,7 @@ int RtcGet(RtcType_t *time)
 }
 int RtcSet(RtcType_t *time)
 {
+	RtcStartWrite(RTC_ADDRESS);
+	RtcWriteBuffer((uint8_t*)time, sizeof(RtcType_t));
 	return 0;
 }

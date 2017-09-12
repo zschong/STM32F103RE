@@ -6,12 +6,15 @@ int printfx(const char *fmt, ...)
 {
 	int ret = 0;
 	va_list ap;
+	char buf[512] = {0};
+
+	va_start(ap, fmt);
+	ret = vsprintf(buf, fmt, ap);
+	va_end(ap);
 
 	GpioOn(PA11);
-	va_start(ap, fmt);
-	ret = vfprintf(stdout, fmt, ap);
-	va_end(ap);
-	for(int i = 0; i < 1000; i++);
+//	for(int i = 0; i < 0x100; i++);
+	printf("%s", buf);
 	GpioOff(PA11);
 
 	return ret;
