@@ -1,7 +1,7 @@
 # STM32F103RE
 STM32F103RE
 
-```
+```c
 #include <string.h>
 #include "gpio.h"
 #include "usart.h"
