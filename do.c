@@ -1,21 +1,45 @@
-#interrupt "do.h"
-#include "gpio.h"
+#include "do.h"
 
-void DoConfig(void)
+/*----------------- private -----------------*/
+bool DoGet(int i)
 {
+	return (bool)(GPIO_ReadInputDataBit(GetPort(i), 0xffff & i) != 0 );
 }
-bool DoGetValue(int i)
-{
-	return false;
-}
-void DoSetValue(int i, bool value)
+void DoSet(int gpio, bool value)
 {
 	if( value )
 	{
-		GpioOn(i);
+		GpioOn(gpio);
 	}
 	else
 	{
-		GpioOff(i);
+		GpioOff(gpio);
+	}
+}
+
+/*----------------- public -----------------*/
+void DoConfig(void)
+{
+	GpioInit(PC7, GPIO_Mode_Out_PP, GPIO_Speed_50MHz);
+	GpioOff(PC7);
+}
+
+bool DoGetValue(int i)
+{
+	switch(i)
+	{
+		case 1:
+			return DoGet(PC7);
+	}
+	return false;
+}
+
+void DoSetValue(int i, bool value)
+{
+	switch(i)
+	{
+		case 1:
+			DoSet(PC7, value);
+			break;
 	}
 }

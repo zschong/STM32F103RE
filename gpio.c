@@ -1,7 +1,7 @@
 #include "gpio.h"
 
 
-static GPIO_TypeDef *GetPort(int gpio)
+GPIO_TypeDef *GetPort(int gpio)
 {
 	switch(gpio >> 24)
 	{

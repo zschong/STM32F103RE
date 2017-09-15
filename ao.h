@@ -2,6 +2,8 @@
 #define __AO_H__
 #include "spi.h"
 
+#define MAX_AO	4
+
 typedef enum
 {
 	Ao_Type_0_10_V,

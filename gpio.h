@@ -3,11 +3,9 @@
 #include "stm32f10x.h"
 #include "stm32f10x_conf.h"
 
-typedef enum
-{
-	false = 0,
-	true = 1,
-}bool;
+#define false	0
+#define	true	1
+#define bool	uint32_t
 
 typedef enum
 {
@@ -130,6 +128,8 @@ typedef enum
 	PG14  = (0x10 << 24 | GPIO_Pin_14),
 	PG15  = (0x10 << 24 | GPIO_Pin_15),
 }GpioPin_t;
+
+GPIO_TypeDef *GetPort(int gpio);
 
 void GpioConfig(GPIO_TypeDef* gpiox, int pin, int mode, int speed);
 void GpioPinOn(GPIO_TypeDef* gpiox, uint32_t pin);

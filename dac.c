@@ -23,9 +23,9 @@ uint16_t DacGetValue(int i)
 {
 	switch(i)
 	{
-		case 0:
-			return DAC->DOR1;
 		case 1:
+			return DAC->DOR1;
+		case 2:
 			return DAC->DOR2;
 	}
 	return DAC->DOR1;
@@ -34,10 +34,10 @@ void DacSetValue(int i, uint16_t value)
 {
 	switch(i)
 	{
-		case 0:
+		case 1:
 			DAC_SetChannel1Data(DAC_Align_12b_R, value);
 			break;
-		case 1:
+		case 2:
 			DAC_SetChannel2Data(DAC_Align_12b_R, value);
 			break;
 	}

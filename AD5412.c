@@ -1,5 +1,6 @@
-#include "AD5412.h"
 #include "gpio.h"
+#include "stdiox.h"
+#include "AD5412.h"
 
 void AD5412_Config(void)
 {
@@ -20,10 +21,10 @@ void AD5412_ChipSelect(int i)
 {
 	switch(i)
 	{
-		case 0:
+		case 1:
 			GpioOff(PC14);
 			break;
-		case 1:
+		case 2:
 			GpioOff(PC15);
 			break;
 	}
@@ -41,35 +42,25 @@ void AD5412_ChipUnselect(int i)
 
 void AD5412_Write(int i, uint32_t value)
 {
-	uint8_t cmd  = (uint8_t)(value >> 16);
-	uint16_t data = (uint16_t)(value >> 00);
-
 	AD5412_ChipSelect(i);
-	SpiSendByte(SPI2, cmd);
-	SpiSendWord(SPI2, data);
-	for(int i = 0; i < 0x1000; i++)
-	{
-		if( SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) != SET )
-		{
-			break;
-		}
-	}
+	SpiSendByte(SPI2, value >> 16);
+	SpiSendWord(SPI2, value >>  0);
 	AD5412_ChipUnselect(i);
 }
 
 uint16_t AD5412_Read(int i)
 {
+	uint16_t a = 0;
+	uint16_t b = 0;
+
 	AD5412_ChipSelect(i);
 	SpiSendByte(SPI2, 0);
+	a = SpiReadWord(SPI2);
 	SpiSendWord(SPI2, 0);
-	for(int i = 0; i < 0x1000; i++)
-	{
-		if( SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) != SET )
-		{
-			break;
-		}
-	}
+	b = SpiReadWord(SPI2);
 	AD5412_ChipUnselect(i);
+
+	printf("AD5412_Read: a = %04X, b = %04X \n ", a, b);
 
 	return SpiReadWord(SPI2);
 }
@@ -103,5 +94,6 @@ uint16_t AD5412_GetControl(int i)
 uint16_t AD5412_GetValue(int i)
 {
 	AD5412_Write(i, AD5412_Cmd_Get << 16 | AD5412_Get_Value);
-	return AD5412_Read(i);
+	for(int i = 0; i < 16; i++);
+	return (AD5412_Read(i) >> 4);
 }

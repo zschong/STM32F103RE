@@ -75,10 +75,13 @@ void SpiConfig(SPI_TypeDef *spix)
 
 void SpiSendWord(SPI_TypeDef *spix, uint16_t word)
 {
-	while( SPI_I2S_GetFlagStatus(spix, SPI_I2S_FLAG_TXE) == RESET );
+	for(int i = 0; i < 0x10; i++);
 	SPI_DataSizeConfig(spix, SPI_DataSize_16b);
-	while( SPI_I2S_GetFlagStatus(spix, SPI_I2S_FLAG_TXE) == RESET );
+	for(int i = 0; i < 1; i++);
+	SPI_Cmd(spix, ENABLE);
+	for(int i = 0; i < 1; i++);
 	SPI_I2S_SendData(spix, word);
+	while( SPI_I2S_GetFlagStatus(spix, SPI_I2S_FLAG_BSY) == SET );
 }
 
 uint16_t SpiReadWord(SPI_TypeDef *spix)
@@ -98,6 +101,7 @@ void SpiSendByte(SPI_TypeDef *spix, uint8_t byte)
 	SPI_DataSizeConfig(spix, SPI_DataSize_8b);
 	while( SPI_I2S_GetFlagStatus(spix, SPI_I2S_FLAG_TXE) == RESET );
 	SPI_I2S_SendData(spix, 0x00ff & byte);
+	while( SPI_I2S_GetFlagStatus(spix, SPI_I2S_FLAG_BSY) == SET );
 }
 
 uint8_t SpiReadByte(SPI_TypeDef *spix)

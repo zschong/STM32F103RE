@@ -2,6 +2,8 @@
 #include "gpio.h"
 #include "usart.h"
 #include "tim.h"
+#include "di.h"
+#include "do.h"
 #include "ai.h"
 #include "ao.h"
 #include "rtc.h"
@@ -15,7 +17,6 @@
 
 void LedInit(void)
 {
-	GpioInit(PC7, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //DO-LED
 	GpioInit(PD2, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //运行-LED
 }
 void UsartInit(void)
@@ -44,7 +45,7 @@ void PwmInit(void)
 
 void TuneLight(int channel, int color, int level, uint32_t *timeout)
 {
-	if( Timeout(timeout, 500) )
+	if( Timeout(timeout, 200) )
 	{
 		if( color )
 		{
@@ -61,9 +62,43 @@ void SystickInit(void)
 {
 	SystickConfig();
 }
+void DiInit(void)
+{
+	DiConfig();
+}
+void DoInit(void)
+{
+	DoConfig();
+}
 void AiInit(void)
 {
+	//Gpio On(4~20mA), GpioOff(0~10V)
+	GpioInit(PC5, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI1-LED-COLOR
+	GpioInit(PB9, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI2-LED-COLOR
+	GpioInit(PB5, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI3-LED-COLOR
+	GpioInit(PB8, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI4-LED-COLOR
+	GpioInit(PA12, GPIO_Mode_Out_PP, GPIO_Speed_50MHz);//AI5-LED-COLOR
+	GpioInit(PA8, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI6-LED-COLOR
+	GpioInit(PC9, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI7-LED-COLOR
+	GpioInit(PC8, GPIO_Mode_Out_PP, GPIO_Speed_50MHz); //AI8-LED-COLOR
 	AiConfig();
+	GpioOff(PC5); 
+	GpioOff(PB9);
+	GpioOff(PB5);
+	GpioOff(PB8);
+	GpioOff(PA12);
+	GpioOff(PA8);
+	GpioOff(PC9);
+	GpioOff(PC8); 
+
+//	GpioOn(PC5); 
+//	GpioOn(PB9);
+//	GpioOn(PB5);
+//	GpioOn(PB8);
+//	GpioOn(PA12);
+//	GpioOn(PA8);
+//	GpioOn(PC9);
+//	GpioOn(PC8); 
 }
 void AoInit(void)
 {
@@ -106,47 +141,56 @@ void LedTest(void)
 	if( Timeout(&timeout5, 1000) )
 	{
 		GpioOff(PD2);
-		GpioOff(PC7);
 	}
 	else
 	{
 		GpioOn(PD2);
-		GpioOn(PC7);
 	}
 	i += 11;
 }
+void DiTest(void)
+{
+	for(int i = 1; i < MAX_DI+1; i++)
+	{
+		printf("DI[%d] = %d \n ", i, DiGetValue(i));
+	}
+}
+void DoTest(void)
+{
+	static uint32_t timeout = 0;
+
+	if( Timeout(&timeout, 1000) )
+	{
+		static bool value = false;
+
+		for(int i = 1; i < MAX_DO+1; i++)
+		{
+			DoSetValue(i, value);
+			printf("DO[%d] = %d\n ", i, DoGetValue(i));
+		}
+		value = !value;
+	}
+}
 void AiTest(void)
 {
-	for(int i = 0; i < 8; i++)
+	for(int i = 1; i < MAX_AI+1; i++)
 	{
-		printf("AI[%d] = %f", i, AiGetValue(i));
-		DelayMSecond(10);
-		printf("\n");
+		printf("AI[%d] = %f \n ", i, AiGetValue(i));
+		DelayMSecond(1);
 	}
 }
 void AoTest(void)
 {
-	for(int i = 0; i < 2; i++)
+	for(int i = 1; i < MAX_AO+1; i++)
 	{
-		AD5412_SetType(i, AD5412_Type_0_To_10_V);
-		DelayMSecond(1000);
-		printf("AO[%d].control=%04X\n ", i, AD5412_GetControl(i));
-		DelayMSecond(1000);
-		AD5412_SetValue(i, 1.5 * (4096.0 / 10.0));
-		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
-		DelayMSecond(1000);
-		AD5412_SetValue(i, 3.5 * (4096.0 / 10.0));
-		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
-		DelayMSecond(1000);
-		AD5412_SetValue(i, 5.5 * (4096.0 / 10.0));
-		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
-		DelayMSecond(1000);
-		AD5412_SetValue(i, 7.5 * (4096.0 / 10.0));
-		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
-		DelayMSecond(1000);
-		AD5412_SetValue(i, 10.0 * (4096.0 / 10.0));
-		printf("AO[%d].Value=%04X\n ", i, AD5412_GetValue(i));
-		DelayMSecond(1000);
+		static uint32_t set = 0;
+
+		if( set++ < 8 )
+		{
+			AoSetType(i, Ao_Type_0_10_V);
+			AoSetValue(i, 1.9);
+		}
+		printf("AO[%d].Value=%f\n ", i, AoGetValue(i));
 	}
 }
 void RtcTest(void)
@@ -170,20 +214,27 @@ void EepromTest(void)
 		wbuf2[i] = (uint8_t)(i+0x11);
 	}
 	EepromWrite(0, wbuf1, sizeof(wbuf1));
-	DelayMSecond(1);
+	DelayMSecond(10);
 	EepromRead(0, rbuf1, sizeof(rbuf1));
-	DelayMSecond(1);
+	DelayMSecond(10);
 	EepromWrite((128 << 10) + 0, wbuf2, sizeof(wbuf2));
-	DelayMSecond(1);
+	DelayMSecond(10);
 	EepromRead((128 << 10) + 0, rbuf2, sizeof(rbuf2));
-	DelayMSecond(1);
+	DelayMSecond(10);
+	if( memcmp(rbuf1, wbuf1, sizeof(rbuf1)) == 0 )
+	{
+		printf(" eeprom1 ok\n ");
+	}
+	if( memcmp(rbuf2, wbuf2, sizeof(rbuf2)) == 0 )
+	{
+		printf(" eeprom2 ok\n ");
+	}
 }
 void UsartTest(void)
 {
 	char *p = "USART2 is ok\n";
 	GpioOn(PA1);
 	UsartSend(USART2, p, strlen(p));
-	DelayMSecond(10);
 	GpioOff(PA1);
 }
 /*------------end of test -----------*/
@@ -196,6 +247,8 @@ int main(void)
 	UsartInit();
 	PwmInit();
 	LedInit();
+	DiInit();
+	DoInit();
 	AiInit();
 	AoInit();
 	RtcInit();
@@ -203,13 +256,15 @@ int main(void)
 
 	while(1)
 	{
-		if( Timeout(&timeout, 200) )
+		if( Timeout(&timeout, 1000) )
 		{	
-			//LedTest();
-			//AiTest();
+//			LedTest();
+			DiTest();
+			DoTest();
+			AiTest();
 			AoTest();
-			//RtcTest();
-			//EepromTest();
+			RtcTest();
+			EepromTest();
 			UsartTest();
 		}
 	}
